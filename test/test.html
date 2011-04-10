@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+  <head>
+    <script type="text/javascript" src="../src/mixarr.js"></script>
+    <script type="text/javascript" src="../lib/fulljslint.js"></script>
+    <script type="text/javascript" src="../lib/quicktest.js"></script>
+  </head>
+  <body>
+    <script>
+      MyBaseArray = function(length) {
+        this.length = length;
+        for (var i=0; i<length; i++) {
+          this.set(i, 0);
+        }
+      };
+      Object.extend(MyBaseArray.prototype, {      
+        get : function(i) {
+          if (i < 0 || i >= this.length) throw("get: out of bounds");
+          return this[i];
+        },
+        
+        set : function(i,v) {
+          if (i < 0 || i >= this.length) throw("set: out of bounds");
+          this[i] = v;
+        }
+      });
+      MyGenericArray = MyBaseArray;
+      MyGenericArray.prototype = new MyBaseArray(0);
+      MyFoldArray = MyBaseArray;
+      MyFoldArray.prototype = new MyBaseArray(0);
+      MyArray = MyBaseArray;
+      MyArray.prototype = new MyBaseArray(0);
+      
+      Object.extend(MyGenericArray.prototype, GenericArrayMixin);
+      Object.extend(MyFoldArray.prototype, GenericArrayFoldMixin);
+      Object.extend(MyArray.prototype, ArrayMixin);
+      
+      Tests.testArrayEquality = function() {
+        qc([randomLength, randomInt], function(l, r) {
+          var a = new MyArray(l);
+          var b = new MyGenericArray(l);
+          var c = new MyFoldArray(l);
+          for (var i=0; i<l; i++) {
+            a.set(i, r+i);
+            b.set(i, r+i);
+            c.set(i, r+i);
+          }
+          assertEquals('a.length == b.length', a.length, b.length);
+          assertEquals('a.length == c.length', a.length, c.length);
+          for (var i=0; i<l; i++) {
+            assertEquals('a.get(i) == b.get(i), '+i, a.get(i), b.get(i));
+            assertEquals('a.get(i) == c.get(i), '+i, a.get(i), c.get(i));
+          }
+          return true;
+        }, 100);
+      };
+      runTests();
+    </script>
+  </body>
+</html>

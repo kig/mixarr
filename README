@@ -1,0 +1,12 @@
+Mixarr - Minimally bootstrapped Array mixin
+-------------------------------------------
+
+Bringing a bunch of array convenience methods to, well, basically 
+anything enumerable.
+
+Implements most of Haskell's PreludeList.
+
+
+LICENSE: BSD
+(c) 2011 Ilmari Heikkinen
+ilmari.heikkinen@gmail.com
