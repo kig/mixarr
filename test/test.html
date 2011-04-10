@@ -35,7 +35,13 @@
       Object.extend(MyFoldArray.prototype, GenericArrayFoldMixin);
       Object.extend(MyArray.prototype, ArrayMixin);
       
-      Tests.testArrayEquality = function() {
+      MixarrTests = {};
+      
+      MixarrTests.startUnit = function() {
+        Array.prototype.get = function(i) { return this[i]; };
+        Array.prototype.set = function(i,v) { this[i] = v; };
+      };
+      MixarrTests.testArrayEquality = function() {
         qc([randomLength, randomInt], function(l, r) {
           var a = new MyArray(l);
           var b = new MyGenericArray(l);
@@ -54,7 +60,79 @@
           return true;
         }, 100);
       };
-      runTests();
+      MixarrTests.testArrayInit = function() {
+        var f = function(i){
+          return i * 10 + 1 - i;
+        };
+        qc([randomLength], function(l) {
+          var a = new MyArray(0).init(f, l);
+          var b = new MyGenericArray(0).init(f, l);
+          var c = new MyFoldArray(0).init(f, l);
+          assertEquals('a.length == b.length', a.length, b.length);
+          assertEquals('a.length == c.length', a.length, c.length);
+          for (var i=0; i<l; i++) {
+            assertEquals('a.get(i) == b.get(i), '+i, a.get(i), b.get(i));
+            assertEquals('a.get(i) == c.get(i), '+i, a.get(i), c.get(i));
+          }
+          return true;
+        }, 100);
+      };
+      MixarrTests.testArrayMap = function() {
+        var f = function(e,i){
+          return i * 10 + 1 - i;
+        };
+        qc([randomLength], function(l) {
+          var a = new MyArray(l).map(f);
+          var b = new MyGenericArray(l).map(f);
+          var c = new MyFoldArray(l).map(f);
+          var d = new Array(l);
+          for (var i=0; i<l; i++)
+            d[i] = f(0, i);
+          assertEquals('a.length == b.length', a.length, b.length);
+          assertEquals('a.length == c.length', a.length, c.length);
+          assertEquals('a.length == d.length', a.length, d.length);
+          for (var i=0; i<l; i++) {
+            assertEquals('a.get(i) == b.get(i), '+i, a.get(i), b.get(i));
+            assertEquals('a.get(i) == c.get(i), '+i, a.get(i), c.get(i));
+            assertEquals('a.get(i) == d.get(i), '+i, a.get(i), d.get(i));
+          }
+          return true;
+        }, 100);
+      };
+      MixarrTests.testFoldLeft = function() {
+        var f = function(i){
+          return i * 10 + 1 - i;
+        };
+        var g = function(s,i){
+          return s + (i * 10 + 1 - i);
+        };
+        qc([randomLength, randomInt], function(l,r) {
+          var a = new MyArray(0).init(f, l).foldLeft(g, r);
+          var b = new MyGenericArray(0).init(f, l).foldLeft(g, r);
+          var c = new MyFoldArray(0).init(f, l).foldLeft(g, r);
+          assertEquals('a == b', a,b);
+          assertEquals('a == c', a,c);
+          return true;
+        }, 10);
+      };
+      MixarrTests.testFoldRight = function() {
+        var f = function(i){
+          return i * 10 + 1 - i;
+        };
+        var g = function(s,i){
+          return s - (i * 10 + 1 - i);
+        };
+        qc([randomLength, randomInt], function(l,r) {
+          var a = new MyArray(0).init(f, l).foldRight(g, r);
+          var b = new MyGenericArray(0).init(f, l).foldRight(g, r);
+          var c = new MyFoldArray(0).init(f, l).foldRight(g, r);
+          assertEquals('a == b', a,b);
+          assertEquals('a == c', a,c);
+          return true;
+        }, 10);
+      };
+      
+      runTests(MixarrTests);
     </script>
   </body>
 </html>
